@@ -1,19 +1,17 @@
 #include <Arduino.h>
+#include <Motor.h>
 
-#define DIR1 10
-#define DIR2 11
-#define PWM 9
+Motor motor = Motor();
 
 void setup() {
-  pinMode(DIR1, OUTPUT);
-  pinMode(DIR2, OUTPUT);
-  pinMode(PWM, OUTPUT);
-
-  digitalWrite(DIR1, HIGH);
-  digitalWrite(DIR2, LOW);
+  Serial.begin(9600);
+  motor.init();
+  motor.setVoltage(3.0);
 }
 
 void loop() {
 
- analogWrite(PWM, 100); 
+  delay(1000);
+  motor.reverse();
+  Serial.println(motor.getPosition());
 }
