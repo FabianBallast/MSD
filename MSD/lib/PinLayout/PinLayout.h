@@ -32,6 +32,7 @@
 
 // One for PWM signal. On UNO, either 3, 5, 6, 9, 10 or 11 (3 must be interrupt!).
 // Connect to ENA on driver.
+// Keep this on 9 for the chirp signal.
 #define PWM 9
 
 #endif

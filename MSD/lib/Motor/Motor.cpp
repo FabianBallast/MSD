@@ -43,9 +43,14 @@ void Motor::resetPosition()
 
 void Motor::setVoltage(float voltage)
 {
-    float vol = min(maxVoltage, voltage);
+    float vol = min(maxVoltage, abs(voltage));
     uint8_t pwm = vol / maxVoltage * 255;
     analogWrite(PWM, pwm);
+
+    if((dir && voltage < 0) || (!dir && voltage > 0))
+    {
+      reverse();
+    }
 }
 
 void Motor::reverse()
