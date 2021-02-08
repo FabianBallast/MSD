@@ -40,17 +40,25 @@ void Motor::resetPosition()
     count = 0;
 }
 
+void Motor::setDirection(int8_t sign)
+{
+  if(sign != prevSign)
+  {
+    prevSign = sign;
+    reverse();
+  }
+}
 
 void Motor::setVoltage(float voltage)
 {
     float vol = min(maxVoltage, abs(voltage));
     uint8_t pwm = vol / maxVoltage * 255;
     analogWrite(PWM, pwm);
-
-    if((dir && voltage < 0) || (!dir && voltage > 0))
-    {
-      reverse();
-    }
+    Serial.print("PWM,");
+    Serial.print(pwm);
+    setDirection(sign(voltage));
+    Serial.print(",Sign,");
+    Serial.println(100* prevSign);
 }
 
 void Motor::reverse()
@@ -94,3 +102,8 @@ void Motor::encoderB()
   else 
     count--;
 } 
+
+int8_t Motor::sign(float number)
+{
+  return (number >= 0) ? 1 : -1; // If number > 0 then 1 else -1
+}

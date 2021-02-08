@@ -1,3 +1,7 @@
+#include <file.h>
+
+#ifdef motor
+
 #include <Arduino.h>
 #include <Motor.h>
 
@@ -15,3 +19,5 @@ void loop() {
   motor.reverse();
   Serial.println(motor.getPosition());
 } 
+
+#endif

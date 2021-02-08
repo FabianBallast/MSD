@@ -43,6 +43,7 @@ class Motor
 
         /// Reverse the direction of the motor.
         void reverse();
+
     
     private:
         const uint8_t _gearRatio = 20;
@@ -52,8 +53,17 @@ class Motor
         bool dir = true;
         const float maxVoltage = 7.5;
 
+        int8_t prevSign = 1;
+
         static void encoderA();
         static void encoderB();
+
+        /// Set the direction of the motor depending on the sign of the voltage.
+        /// \param[in] sign Sign of the voltage. >0 = 1, <0 = -1.
+        void setDirection(int8_t sign);
+
+        /// Returnt the sign of the voltage.
+        int8_t sign(float number);
 };
 
 #endif
