@@ -14,4 +14,4 @@ void loop() {
   delay(1000);
   motor.reverse();
   Serial.println(motor.getPosition());
-}
+} //test
