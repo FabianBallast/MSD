@@ -93,4 +93,4 @@ void Motor::encoderB()
     count++;
   else 
     count--;
-} //test
+} 
