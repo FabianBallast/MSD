@@ -13,7 +13,6 @@ private:
     // Pointer to motor.
     Motor* _motor;
     const float pi = 3.14159;
-    const uint8_t resolution = 1;
     float frequency;
     long double percentage;
     long double prevPer = 0;
@@ -21,6 +20,8 @@ private:
     long double startTime;
     long double time;
     float volVal;
+
+    bool chirpDone = false;
 
     // Array for logarithmic spacing of freqeuncies between two decades. Multiply current freq with ratio.
     double ratio[30];
@@ -46,6 +47,10 @@ public:
     /// \param[in] frequency Freqeuncy in Hz.
     /// \param[in] voltAmp Amplitude of voltage in V.
     void sineWave(float frequency, float voltAmp);
+
+    /// Return true if done with chirp sequence. 
+    /// \returns Boolean; true if done lese false.
+    bool doneChirp();
 };
 
 

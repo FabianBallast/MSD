@@ -51,14 +51,12 @@ void Motor::setDirection(int8_t sign)
 
 void Motor::setVoltage(float voltage)
 {
+    
     float vol = min(maxVoltage, abs(voltage));
-    uint8_t pwm = vol / maxVoltage * 255;
+    uint8_t pwm = vol / maxVoltage * (255 - 60) + 60;
     analogWrite(PWM, pwm);
-    Serial.print("PWM,");
-    Serial.print(pwm);
     setDirection(sign(voltage));
-    Serial.print(",Sign,");
-    Serial.println(100* prevSign);
+    delayMicroseconds(resolution);
 }
 
 void Motor::reverse()

@@ -52,6 +52,7 @@ class Motor
 
         bool dir = true;
         const float maxVoltage = 7.5;
+        const int8_t resolution = 1;
 
         int8_t prevSign = 1;
 
