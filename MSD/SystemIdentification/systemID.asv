@@ -39,34 +39,18 @@ amps= 0;
 G = [];
 f = [];
 P = [];
-
 for i = 2:length(iIm)
     chunck = y_7V(iIm(i-1):iIm(i));
-    chunck_in = x_7V(iIm(i-1):iIm(i));
     amps(i) = (max(chunck) - min(chunck)) / 2;
-    amps_in = (max(chunck_in) - min(chunck_in)) / 2;
-    G(i-1) = 20*log10(amps(i) / amps_in);
-    [h, maxI] = max(chunck);
-    [h, maxIn] = max(chunck_in);
-    P_temp = (maxIn - maxI) / (iIm(i) - iIm(i-1)) * 360;
-    if P_temp < 0
-        P(i-1) =  P_temp;
-    else
-        P(i-1) = P_temp - 360; 
-    end% + 90;
+    G(i-1) = 20*log10(amps(i) / 7.5);
+    [_, maxI] = max(chunck);
+    P(i-1) = maxI / (iIm(i) - iIm(i-1)) * -360 + 90;
     f(i-1) = 1/((iIm(i) - iIm(i-1)) / 100);
 end
 
 figure();
-tiledlayout(2,1); 
-nexttile;
-semilogx(f, G); grid on;
-ylabel("Gain (dB)");
-xlabel("Frequency (Hz)");nexttile;
-semilogx(f,  P); 
-ylim([-270, 0]);
-ylabel("Phase (deg)");
-xlabel("Frequency (Hz)");
+loglog(f, G); hold on;
+semilogx(f,  P); hold off;
 grid on;
 % for i = 1:length(freq)
 %     Tr = 1 / freq(i);
@@ -75,8 +59,8 @@ grid on;
 %     endSin(i) = steps;
 % end
 
-figure();
-plot(x_7V);
+% figure();
+% plot(x_7V);
 % hold on;
 % plot(iIm, zeros(1, length(iIm)), 'o');hold off;
 %%
