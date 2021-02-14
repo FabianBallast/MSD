@@ -16,10 +16,13 @@ fs = 100;
 nfs = 1*length(x_7V);
 wind = kaiser(nfs,15);
 
-tfestimate(x_7V,y_7V,[],[],nfs,fs);
+[T,f] = tfestimate(x_7V,y_7V,[],[],nfs,fs);
+figure(1);
+subplot(2,1,1);semilogx(f,20*log10(abs(T)));
+subplot(2,1,2);semilogx(f,rad2deg(angle(T)));
 %%
 data = iddata(y_7V, x_7V, 1/fs);
 sys = ssregest(data, 3);
 %%
-sysc = d2c(sys);
-bode(sysc);
+% sysc = d2c(sys);
+% bode(sysc);
