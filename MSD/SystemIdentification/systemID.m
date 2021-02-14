@@ -5,8 +5,11 @@ T = readtable('data.xlsx');
 x_7V = table2array(T(:, 9));
 y_7V = table2array(T(:, 10));
 
-x_7V = x_7V(1:length(x_7V)-1, :);
-y_7V = y_7V(1:length(y_7V)-1, :);
+x_7V = x_7V(2:length(x_7V)-1, :);
+y_7V = y_7V(2:length(y_7V)-1, :);
+
+x_7V = str2double(x_7V);
+y_7V = str2double(y_7V);
 
 
 freq= logspace(-2, 1, 27);
@@ -88,9 +91,13 @@ wind = kaiser(nfs,15);
 f = logspace(-2, 1, 28);
 
 tfestimate(x_7V,y_7V,[],[],f,fs)
+[T,f] = tfestimate(x_7V,y_7V,[],[],nfs,fs);
+figure(1);
+subplot(2,1,1);semilogx(f,20*log10(abs(T)));
+subplot(2,1,2);semilogx(f,rad2deg(angle(T)));
 %%
 data = iddata(y_7V, x_7V, 1/fs);
 sys = ssregest(data, 3);
 %%
-sysc = d2c(sys);
-bode(sysc);
+% sysc = d2c(sys);
+% bode(sysc);
