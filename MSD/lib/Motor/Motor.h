@@ -16,6 +16,11 @@
 volatile static int32_t count = 0;
 volatile static bool forw = true;
 volatile static bool encALast = true;
+volatile static uint8_t switchState = 0;
+// volatile static unsigned long prevTime = 0;
+// volatile static unsigned long currTime = 0;
+// volatile static float speed = 0; 
+
 
 class Motor
 {   
@@ -53,6 +58,15 @@ class Motor
         bool dir = true;
         const float maxVoltage = 7.5;
         const int8_t resolution = 1;
+
+        float speed=  0;
+        unsigned long currTime = 0;
+        unsigned long prevTime = 0;
+        float startPos;
+        float endPos;
+
+        uint8_t _pwm;
+
 
         int8_t prevSign = 1;
 
