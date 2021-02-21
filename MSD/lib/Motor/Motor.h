@@ -52,7 +52,7 @@ class Motor
     
     private:
         const uint8_t _gearRatio = 20;
-        const uint8_t _ticksPerRotation = 48;
+        const uint8_t _ticksPerRotation = 52;
         const float _posRat = 360.0 / _ticksPerRotation / _gearRatio;
 
         bool dir = true;

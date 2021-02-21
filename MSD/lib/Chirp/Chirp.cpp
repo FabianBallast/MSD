@@ -21,71 +21,109 @@ void Chirp::init()
     // TCCR1B = (TCCR1B & 0b11111000) | 1;//set timer 1B (pin 9) to 31250khz
 }
 
-void Chirp::chirpSignal(float freq0, float freq1, float voltAmp) // 10  -> 1000
+void Chirp::chirpSignal(float freq0, float freq1, float voltAmp, float tPeriod) // 10  -> 1000
 {
-  frequency = freq0;
-  uint8_t decades = log10(round(freq1 / freq0));
-  Serial.println(decades);
-  startTime = micros();
-  endTime = startTime + 1000000 / freq0;
-  long double printTime = 0;
+  const float k = pow((freq1 / freq0), 1.0/tPeriod);
+  // Serial.println(k);
+  const float constK = 1/log(k);
+  
+  long double start = micros();
+  long double t = micros();
 
+  float angle = 0;
+  const float constAngle = 2.0 * pi * freq0 * constK;
+  // Serial.println(constAngle);
+  long double printT = start;
 
-  for(int i = 0; i < decades; i++) // Twee keer: 10 -> 100 & 100 -> 1000
+  const uint32_t period = tPeriod * 1000000.0;
+  const float kStart = pow(k, start/1000000.0);
+  // Serial.println(kStart);
+
+  const float offset =0;
+  const float amp = voltAmp;
+
+  while(t - start < period)
   {
-    for(int j = 0; j < _stepsPerDecade;) // [1, 1.29, 1.67 ...]
-    {
-      time = micros();
-      volVal = voltAmp * sin(((time-startTime) * frequency) * 2 * pi /1000000);
-      // end1 = micros(); 
+    angle = (pow(k, (t-start) * 0.000001)-kStart) * constAngle;
+    volVal = amp * sin(angle) + offset;
+    _motor->setVoltage(volVal);
 
-      _motor->setVoltage(volVal);
+    if(t - printT >= 1250){ // Print every 10.000 microseconds (10 ms)
+        // Serial.println(volVal, 3);
+        // Serial.print(",");
+        Serial.println( _motor->getPosition());
+        printT += 1250;
+    }
 
-      // end2 = micros();
+    t = micros();
+  }
 
-      if(time - printTime >= 10000){ // Print every 10.000 microseconds (10 ms)
-        // start3 = micros();
-        // Serial.print("VOL,");
-        //Serial.print(volVal);
-        Serial.print(volVal);
-        Serial.print(",");
-        Serial.println(_motor->getPosition());
-        // Serial.print(_motor->getPosition());
-        // Serial.print(",");
-        // Serial.println((uint32_t) (time - printTime));
-        // Serial.print(",");
-        // Serial.print((uint32_t) (end1 - time));
-        // Serial.print(",");
-        // // Serial.print((uint32_t) (end2 - end1));
-        // end3 = micros();
-        // Serial.println((uint32_t) (end3 - start3));
-        printTime += 10000;
-      }
+  chirpDone = true;
+  _motor->setVoltage(0);
+  // frequency = freq0;
+  // uint8_t decades = log10(round(freq1 / freq0));
+
+  // Serial.println(decades);
+  // startTime = micros();
+  // endTime = startTime + 1000000 / freq0;
+  // long double printTime = 0;
+
+
+  // for(int i = 0; i < decades; i++) // Twee keer: 10 -> 100 & 100 -> 1000
+  // {
+  //   for(int j = 0; j < _stepsPerDecade;) // [1, 1.29, 1.67 ...]
+  //   {
+  //     time = micros();
+  //     volVal = voltAmp * sin(((time-startTime) * frequency) * 2 * pi /1000000);
+  //     // end1 = micros(); 
+
+  //     _motor->setVoltage(volVal);
+
+  //     // end2 = micros();
+
+  //     if(time - printTime >= 1250){ // Print every 10.000 microseconds (10 ms)
+  //       // start3 = micros();
+  //       // Serial.print("VOL,");
+  //       //Serial.print(volVal);
+  //       Serial.print(volVal);
+  //       Serial.print(",");
+  //       Serial.println(_motor->getPosition());
+  //       // Serial.print(_motor->getPosition());
+  //       // Serial.print(",");
+  //       // Serial.println((uint32_t) (time - printTime));
+  //       // Serial.print(",");
+  //       // Serial.print((uint32_t) (end1 - time));
+  //       // Serial.print(",");
+  //       // // Serial.print((uint32_t) (end2 - end1));
+  //       // end3 = micros();
+  //       // Serial.println((uint32_t) (end3 - start3));
+  //       printTime += 10000;
+  //     }
       
 
-      if(time >= endTime)
-      {
-        j++; 
+  //     if(time >= endTime)
+  //     {
+  //       j++; 
 
-        if(i < decades - 1 && j == _stepsPerDecade - 1)
-        {
-          i++;
-          j = 0;
-        }
-        else if(i == decades -1 && j == _stepsPerDecade)
-        {
-          chirpDone = true;
-          Serial.println("Done");
-          _motor->setVoltage(0);
-        }
+  //       if(i < decades - 1 && j == _stepsPerDecade - 1)
+  //       {
+  //         i++;
+  //         j = 0;
+  //       }
+  //       else if(i == decades -1 && j == _stepsPerDecade)
+  //       {
+  //         chirpDone = true;
+  //         Serial.println("Done");
+  //         _motor->setVoltage(0);
+  //       }
 
-        frequency = freq0 * pow(10, i) * ratio[j];
-        startTime = endTime; //micros();
-        endTime = startTime + 1000000 / frequency;
-      }
+  //       frequency = freq0 * pow(10, i) * ratio[j];
+  //       startTime = endTime; //micros();
+  //       endTime = startTime + 1000000 / frequency;
+  //     }
 
-    }
-  }
+  //   }
+  // }
 
   
 

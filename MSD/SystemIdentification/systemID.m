@@ -1,17 +1,40 @@
 %% Read data from file. 
+clear all;
 T = readtable('data.xlsx');
 
 %% Retrieve columns from table.  
-x_75V_LowFreq = table2array(T(:, 25));
-y_75V_LowFreq = table2array(T(:, 26));
-x_375V_LowFreq = table2array(T(:, 27));
-y_375V_LowFreq = table2array(T(:, 28));
+x_75V_LowFreq = rmmissing(table2array(T(:, 25)));
+y_75V_LowFreq = rmmissing(table2array(T(:, 26)));
+x_375V_LowFreq = rmmissing(table2array(T(:, 27)));
+y_375V_LowFreq = rmmissing(table2array(T(:, 28)));
 
 % Remove NAN's from array with rmmissing()
 x_75V_HighFreq = rmmissing(table2array(T(:, 17)));
 y_75V_HighFreq = rmmissing(table2array(T(:, 18)));
 x_375V_HighFreq = rmmissing(table2array(T(:, 19)));
 y_375V_HighFreq = rmmissing(table2array(T(:, 20)));
+
+x_full = table2array(T(:, 31));
+y_full = table2array(T(:, 32));
+
+%%
+figure();
+plot(x_full);
+figure();
+plot(y_full);
+%% tfEstimate
+close all;
+
+figure();
+N = length(x_full);
+nfs = [];
+wind = [];
+
+[T, f] = tfestimate(x_full, y_full, wind, [], nfs, 800);
+[C, f] = mscohere(x_full, y_full, [], [], [], 800);
+subplot(3,1,1); semilogx(f, 20*log10(abs(T)));
+subplot(3,1,2); semilogx(f, rad2deg(angle(T)));
+subplot(3,1,3); semilogx(f, C);
 %% First analyze low frequency parts. 
 
 % Find beginning/end of sine. 
@@ -70,8 +93,13 @@ for i = 1:length(end_Y_75_LF)
     [h, iMaxPos375] = max(posWave375V);
     [h, iMaxVol375] = max(volWave375V); 
   
+    if i == length(end_Y_75_LF)
+        length_75 = (iMaxPos75 - end_Y_75_LF(i-1)) * 2;
+        length_375 = (iMaxPos375 - end_Y_375_LF(i-1)) * 2;
+    end
     
     P_temp_75V = (iMaxVol75 - iMaxPos75) / (length_75) * 360;
+    
     if P_temp_75V < -40
         P_75_LW(i) =  P_temp_75V;
     else
@@ -93,6 +121,8 @@ end
 % Find beginning/end of sine. 
 [end_U_75_HF, end_Y_75_HF] = findEnds(x_75V_HighFreq, y_75V_HighFreq);
 [end_U_375_HF, end_Y_375_HF] = findEnds(x_375V_HighFreq, y_375V_HighFreq);
+end_Y_375_HF(end-3)= 3297;
+end_Y_375_HF(1) = [];
 
 % Plot for confirmation
 figure(3);
@@ -103,6 +133,13 @@ figure(4);
 plot(y_75V_HighFreq); hold on;
 plot(end_Y_75_HF, zeros(1, length(end_Y_75_HF)), 'o'); hold off;
 
+figure(5);
+plot(x_375V_HighFreq); hold on;
+plot(end_U_375_HF, zeros(1, length(end_U_375_HF)), 'o'); hold off;
+
+figure(6);
+plot(y_375V_HighFreq); hold on;
+plot(end_Y_375_HF, zeros(1, length(end_Y_375_HF)), 'o'); hold off;
 %%
 % Analyse each sine wave for gain/phase.
 G_75_HW = [];
@@ -120,19 +157,19 @@ for i = 1:13%length(end_U_75_HF)
         volWave75V = x_75V_HighFreq(1:end_Y_75_HF(i));
         
         length_375 = end_Y_375_HF(i+1);
-        posWave375V = y_375V_HighFreq(1:end_Y_375_HF(i+1));
-        volWave375V = x_375V_HighFreq(1:end_Y_375_HF(i+1));
+        posWave375V = y_375V_HighFreq(1:end_Y_375_HF(i));
+        volWave375V = x_375V_HighFreq(1:end_Y_375_HF(i));
     else
         length_75 = end_Y_75_HF(i) - end_Y_75_HF(i-1);
         posWave75V = y_75V_HighFreq(end_Y_75_HF(i-1):end_Y_75_HF(i));
         volWave75V = x_75V_HighFreq(end_Y_75_HF(i-1):end_Y_75_HF(i));
         
-        length_375 = end_Y_375_HF(i+1) - end_Y_375_HF(i);
-        posWave375V = y_375V_HighFreq(end_Y_375_HF(i):end_Y_375_HF(i+1));
-        volWave375V = x_375V_HighFreq(end_Y_375_HF(i):end_Y_375_HF(i+1));
+        length_375 = end_Y_375_HF(i) - end_Y_375_HF(i-1);
+        posWave375V = y_375V_HighFreq(end_Y_375_HF(i-1):end_Y_375_HF(i));
+        volWave375V = x_375V_HighFreq(end_Y_375_HF(i-1):end_Y_375_HF(i));
     end
     
-    amp_pos_75V = (max(posWave75V) - min(posWave75V)) / 2;
+    amp_pos_75V = (max(posWave75V) - y_75V_HighFreq(end_Y_75_HF(i)))/2;
     amp_vol_75V = (max(volWave75V) - min(volWave75V)) / 2;
     G_75_HW(i) = 20*log10(amp_pos_75V / amp_vol_75V);
     
@@ -201,9 +238,7 @@ semilogx(f_75_LW, G_75_LW, 'b'); grid on; hold on;
 semilogx(f_375_LW, G_375_LW, 'r'); 
 semilogx(f_75_HW, G_75_HW, 'k'); 
 semilogx(f_375_HW, G_375_HW, 'g');
-semilogx(wout / 2 / pi, mag, 'm'); 
-semilogx(woutc / 2 / pi, magc, 'y'); 
-semilogx(woutc_fb / 2 / pi, magc_fb, 'c'); hold off;
+semilogx(wout / 2 / pi, mag, 'm');  hold off;
 ylabel("Gain (dB)");
 xlabel("Frequency (Hz)");nexttile;
 semilogx(f_75_LW,  P_75_LW, 'b'); hold on;
@@ -211,8 +246,6 @@ semilogx(f_375_LW, P_375_LW, 'r');
 semilogx(f_75_HW, P_75_HW, 'k'); 
 semilogx(f_375_HW, P_375_HW, 'g');
 semilogx(wout/ 2 / pi, squeeze(phase), 'm');
-semilogx(woutc/ 2 / pi, squeeze(phasec), 'y');
-semilogx(woutc_fb/ 2 / pi, squeeze(phasec_fb), 'c');
 hold off;
 ylim([-270, 0]);
 ylabel("Phase (deg)");
@@ -238,7 +271,7 @@ function [endPointsX, endPointsY] = findEnds(pointsX, pointsY)
     
     for i = 2:length(pointsY)
         if(downY == 1 && pointsY(i) - prevY > 0 && pointsY(i)< 5000 && i - iPrevY > 15)
-            endPointsY(iY) = i;
+            endPointsY(iY) = i-3;
             iY = iY + 1;
             downY = 0;
             iPrevY = i;
@@ -253,7 +286,7 @@ function [endPointsX, endPointsY] = findEnds(pointsX, pointsY)
         prevY = pointsY(i);
         
         if(downX == 1 && pointsX(i) - prevX > 0 && pointsX(i)< 5000 && i - iPrevX > 5)
-            endPointsX(iX) = i;
+            endPointsX(iX) = i-1;
             iX = iX + 1;
             downX = 0;
             iPrevX = i;

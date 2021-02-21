@@ -41,7 +41,7 @@ public:
     /// \param[in] freq0 Starting frequency in Hz.
     /// \param[in] freq1 Final frequency in Hz.
     /// \param[in] voltAmp Amplitude of voltage in V.
-    void chirpSignal(float freq0, float freq1, float voltAmp);
+    void chirpSignal(float freq0, float freq1, float voltAmp, float tPeriod);
 
     /// Create a sine wave with set frequency and amplitude.
     /// \param[in] frequency Freqeuncy in Hz.

@@ -24,7 +24,8 @@ void loop() {
     
     while(!chirp.doneChirp())
     {
-      chirp.chirpSignal(0.01, 1, 3.75);
+      Serial.println("Start");
+      chirp.chirpSignal(0.01, 100, 7.5, 100);
     }
 //   delay(1000);
 //   motor.reverse();
