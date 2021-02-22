@@ -24,7 +24,6 @@ void loop() {
     
     while(!chirp.doneChirp())
     {
-      Serial.println("Start");
       chirp.chirpSignal(0.01, 100, 7.5, 100);
     }
 //   delay(1000);

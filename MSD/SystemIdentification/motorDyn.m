@@ -1,4 +1,4 @@
-function [A,B,C,D,K,X0] = motorDyn(a, b, c,ts)
+function [A,B,C,D,K,X0] = motorDyn(k, zeta, omega,ts)
 %MOTORDYNAMICS ODE file representing the dynamics of a motor.
 %
 %   [A,B,C,D,K,X0] = motorDynamics(Tau,Ts,G)
@@ -23,11 +23,11 @@ function [A,B,C,D,K,X0] = motorDyn(a, b, c,ts)
 % t = par(1);
 % G = par(2);
 
-A = [-b, -c, 0;
+A = [-2*zeta*omega, -omega^2, 0;
      1, 0, 0;
      0, 1, 0];
  B = [1;0;0];
- C = [0,0,a];
+ C = [0,0,k];
  D = [0];
  K = [0;0;0];
  X0 = K;

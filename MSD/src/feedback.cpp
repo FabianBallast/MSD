@@ -8,7 +8,7 @@
 #include <Prefilter.h>
 
 Motor motor = Motor();
-Feedback controller = Feedback(1.005075999394213, -0.980259308051146, -0.523809523809524);
+Feedback controller = Feedback(1.883954850884436, -1.819150507119370, -0.391304347826087);
 unsigned long before = 0;
 unsigned long after = 0;
 float reference = 360;
@@ -37,14 +37,18 @@ void loop() {
 
     if(time - last > 5000)
     {
+        // reference = pref.triangular(time / 1000000.0, tStart);
+        // reference = 360;
         reference = pref.stepFilter(time / 1000000.0, tStart);
         // Serial.println(reference);
         pos = motor.getPosition();
         error = reference - pos;
         conVal = controller.controlValue(error);
+        // conVal = error / 100.0;
         motor.setVoltage(conVal);
-        // Serial.print(reference);
-        // Serial.print(',');
+        // Serial.print(100*conVal);
+        Serial.print(reference);
+        Serial.print(',');
         Serial.println(motor.getPosition());
         // Serial.println(conVal);
         last += 5000;

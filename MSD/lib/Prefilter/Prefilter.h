@@ -16,6 +16,8 @@ private:
 
     float t1 = 0;
     float t2 = 0;
+    float t3 = 0;
+    float t4 = 0;
     float tf = 0;
 
     float sCurr = 0;
@@ -26,6 +28,8 @@ public:
     Prefilter(float tRest, float vmax, float amax);
     
     float stepFilter(float t, float tStart);
+    float triangular(float t, float tStart);
+    float sysID(float t, float tStart);
 };
 
 

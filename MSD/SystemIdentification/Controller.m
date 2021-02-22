@@ -5,12 +5,12 @@ omega = 2.3 * 2 * pi;
 k = 80000;
 G = 1/s * k / (s^2 + 2 * zeta * omega * s + omega^2);
 
-omega_control = 10 * 2 * pi;
-C_ff = 1 / G * (1/(s/omega_control + 1)^4);
+omega_control = 100;
+C_ff = 1 / Gres * (1/(s/omega_control + 1)^4);
 
 
-wc = 25;
-gain_G = abs(evalfr(G, wc * 1j));
+wc = 35;
+gain_G = abs(evalfr(Gres, wc * 1j));
 kp = 1/(5*gain_G);
 wi = 1/10 * wc;
 wd = 1/5 * wc;
@@ -33,7 +33,7 @@ close all;
 
 figure();
 title('Plant');
-bode(G);
+bode(Gres);
 
 figure()
 title('Feedforward');
@@ -41,7 +41,7 @@ bode(C_ff);
 
 figure();
 title('Total feedforward gain');
-bode(C_ff * G);
+bode(C_ff * Gres);
 
 figure();
 title('Feedback');
@@ -49,8 +49,8 @@ bode(C_fb);
 
 figure();
 title('Open Loop Feedback');
-bode(C_fb * G);
-margin(C_fb * G);
+bode(C_fb * Gres);
+margin(C_fb * Gres);
 
 %% Simulations with normal step
 close all;
@@ -61,20 +61,20 @@ step(C_ff, opt);
 title('Input required for feedforward');
 
 figure();
-step(C_ff * G, opt);
+step(C_ff * Gres, opt);
 title('Output with feedforward');
 
 figure();
-step(C_fb / (1 + C_fb * G), opt);
+step(C_fb / (1 + C_fb * Gres), opt);
 title('Input required for feedback');
 
 figure();
-step(C_fb * G / (1 + C_fb * G), opt);
+step(C_fb * Gres / (1 + C_fb * Gres), opt);
 title('Output with feedback');
 
 
 %% Pre-filter test
-[r, t] = stepFilter(0, 360, 0.001, 2000, 3000);
+[r, t] = stepFilter(0, 360, 0.005, 2200, 9000);
 figure();
 plot(t, r);
 
@@ -84,39 +84,40 @@ plot(tOut, y);
 title('Input required for feedforward');
 
 figure();
-lsim(C_ff * G, r, t);
+lsim(C_ff * Gres, r, t);
 %plot(tOut, y);
 title('Output with feedforward');
 
 figure();
-[y, tOut] = lsim(C_fb / (1 + C_fb * G), r, t);
+[y, tOut] = lsim(C_fb / (1 + C_fb * Gres), r, t);
 plot(tOut, y);
 title('Input required for feedback');
 
 figure();
-lsim(C_fb * G / (1 + C_fb * G), r, t);
+lsim(C_fb * Gres / (1 + C_fb * Gres), r, t);
 %plot(tOut, y);
 title('Output with feedback');
 
 %% Pre-filter digital
 close all;
 ts = 0.005; %100 Hz
-C_ffd = c2d(C_ff, ts, 'tustin');
+C_ffd = c2d(C_ff, 0.002, 'tustin');
 C_fbd = c2d(C_fb, ts, 'tustin');
-Gd = c2d(G, ts);
+Gd = c2d(Gres, ts);
+Gdf = c2d(Gres, 0.002);
 
-
-[r, t] = stepFilter(0, 360, ts, 2200, 10000);
+[r, t] = stepFilter(0, 360, ts, 2200, 9000);
+[r2, t2] = stepFilter(0, 360, 0.002, 2200, 9000);
 figure();
 plot(t, r);
 
 figure();
-[y, tOut] = lsim(C_ffd, r, t);
+[y, tOut] = lsim(C_ffd, r2, t2);
 plot(tOut, y);
 title('Input required for feedforward');
 
 figure();
-lsim(C_ffd * Gd, r, t);
+lsim(C_ffd * Gdf, r2, t2);
 %plot(tOut, y);
 title('Output with feedforward');
 
