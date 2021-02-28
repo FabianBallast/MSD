@@ -40,8 +40,8 @@ title('Feedforward');
 bode(C_ff);
 
 figure();
-title('Total feedforward gain');
 bode(C_ff * Gres);
+title('Total feedforward gain');
 
 figure();
 title('Feedback');
@@ -51,6 +51,11 @@ figure();
 title('Open Loop Feedback');
 bode(C_fb * Gres);
 margin(C_fb * Gres);
+
+figure();
+title('Sensitivity function');
+bode(1/(1+C_fb * Gres));
+
 
 %% Simulations with normal step
 close all;
@@ -100,7 +105,7 @@ title('Output with feedback');
 
 %% Pre-filter digital
 close all;
-ts = 0.005; %100 Hz
+ts = 0.01; %100 Hz
 C_ffd = c2d(C_ff, 0.002, 'tustin');
 C_fbd = c2d(C_fb, ts, 'tustin');
 Gd = c2d(Gres, ts);

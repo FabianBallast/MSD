@@ -60,7 +60,8 @@ bode(sys2);
 % y_full = table2array(T(1:40000, 32));
 load(fullfile(matlabroot, 'toolbox', 'ident', 'iddemos', 'data', 'dcmotordata'));
 % data = iddata(y_full, x_full, 0.002, 'Name', 'DC-motor');
-data = iddata(y_f2, x_f2, dt2, 'Name', 'DC-motor');
+% data = iddata(y_f2, x_f2, dt2, 'Name', 'DC-motor');
+data = iddata(Y_ID, V_ID, dt2, 'Name', 'DC-motor');
 % data = iddata(y(:, 1), u, 0.1, 'Name', 'DC-motor');
 data.InputName = 'Voltage';
 data.InputUnit = 'V';
@@ -79,6 +80,8 @@ data.TimeUnit = 's';
 k = 80000;
 zeta =1;
 omega = 2.3 * 2 * pi; 
+
+% 1/s * k / (s^2 + 2 * zeta * omega + omega^2)
 
 parameters = 0;
 init_sys = idgrey('motorDyn',{'k',k; 'zeta', zeta; 'omega', omega},'c');
